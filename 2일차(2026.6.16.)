@@ -1,0 +1,52 @@
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+
+x_train = [1, 2, 3, 4]
+y_train = [0, -1, -2, -3]
+
+//이 데이터는 y = -x + 1 이라는 명확한 규칙(함수)을 가지고 있습니다. 
+//인공지능에게 이 데이터를 주고 "너가 이 규칙(y = wx + b)을 찾아내봐!"라고 주문하는 것입니다.
+
+tf.model = tf.keras.Sequential()
+tf.model.add(tf.keras.layers.Dense(units=1, input_dim=1))
+
+//⁠Sequential()⁠은 레이어를 일직선으로 차곡차곡 쌓는 가장 기본적인 모델 형태입니다.
+//Dense(units=1, input_dim=1)⁠는 입력 데이터의 차원이 1개(⁠input_dim=1⁠)이고, 
+//출력되는 결과물도 1개(⁠units=1⁠)인 가장 단순한 형태의 인공신경망 레이어를 의미합니다. 
+//다시말해 y = wx + b 라는 하나의 직선 방정식을 만든 것입니다.
+
+sgd = tf.keras.optimizers.SGD(lr=0.1)
+tf.model.compile(loss='mse', optimizer=sgd)
+
+//optimizer=sgd⁠: **SGD(확률적 경사하강법)**라는 알고리즘을 사용해 모델의 가중치(w, b)를 업데이트합니다. 
+⁠//lr=0.1⁠은 학습률(Learning Rate)로, 한 번에 얼마나 크게 정답을 찾아 이동할지 결정합니다. 
+//(참고: 최신 텐서플로우 버전에서는 ⁠lr⁠ 대신 ⁠learning_rate=0.1⁠로 적는 것이 권장됩니다.)
+//loss='mse'⁠: 모델이 예측한 값과 실제 정답의 차이를 계산하는 공식으로 MSE(평균제곱오차)를 사용합니다. 이 오차(Loss)가 0에 가까워지도록 학습이 진행됩니다.
+⁠//tf.model.summary()⁠: 현재 만들어진 신경망 모델의 구조와 학습 가능한 파라미터(변수) 개수를 화면에 요약해서 보여줍니다.
+
+tf.model.summary()
+
+# fit() trains the model and returns history of train
+history = tf.model.fit(x_train, y_train, epochs=100)
+
+//fit()⁠ 함수가 실제 학습을 수행하는 명령어입니다.
+//⁠epochs=100⁠: 준비한 데이터를 총 100번 반복해서 보며 학습하라는 뜻입니다. 
+//반복할수록 오차(⁠loss⁠)가 점점 줄어드는 것을 콘솔 창에서 확인할 수 있습니다. 학습 결과 데이터는 ⁠history⁠ 변수에 저장됩니다.
+
+y_predict = tf.model.predict(np.array([5, 4]))
+print(y_predict)
+
+//학습이 끝난 모델에게 새로운 x 값인 ⁠5⁠와 ⁠4⁠를 주고 결과를 예측해 보라고 시킵니다.
+
+# Plot training & validation loss values
+plt.plot(history.history['loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+//학습이 진행됨에 따라 오차(⁠loss⁠)가 어떻게 줄어들었는지 그래프로 그려주는 부분입니다.
+//x축은 반복 횟수(⁠Epoch⁠), y축은 오차(⁠Loss⁠)를 나타내며, 처음에는 오차가 컸다가 에폭이 진행될수록 0을 향해
+//급격하게 떨어지는 곡선 그래프가 화면에 나타나게 됩니다.
